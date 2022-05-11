@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import './CategoryItem.scss';
 
 const CategoryItem = ({ category }) => {

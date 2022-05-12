@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app';
-
 import {
   getAuth,
+  signInWithRedirect,
   signInWithPopup,
   GoogleAuthProvider,
   createUserWithEmailAndPassword,
@@ -9,7 +9,6 @@ import {
   signOut,
   onAuthStateChanged,
 } from 'firebase/auth';
-
 import {
   getFirestore,
   doc,
@@ -18,19 +17,16 @@ import {
   collection,
   writeBatch,
   query,
-  getDocs
+  getDocs,
 } from 'firebase/firestore';
 
-// import { getAnalytics } from 'firebase/analytics';
-
 const firebaseConfig = {
-  apiKey: 'AIzaSyCtHUK1dHzLCGqSupX2bc9raDe_PUa0NXA',
-  authDomain: 'crwn-clothing-db-86d18.firebaseapp.com',
-  projectId: 'crwn-clothing-db-86d18',
-  storageBucket: 'crwn-clothing-db-86d18.appspot.com',
-  messagingSenderId: '188796478952',
-  appId: '1:188796478952:web:e3b23a6d7275060f36305d',
-  measurementId: 'G-41X3WY7NDP',
+  apiKey: 'AIzaSyDDU4V-_QV3M8GyhC9SVieRTDM4dbiT0Yk',
+  authDomain: 'crwn-clothing-db-98d4d.firebaseapp.com',
+  projectId: 'crwn-clothing-db-98d4d',
+  storageBucket: 'crwn-clothing-db-98d4d.appspot.com',
+  messagingSenderId: '626766232035',
+  appId: '1:626766232035:web:506621582dab103a4d08d6',
 };
 
 initializeApp(firebaseConfig);
@@ -44,16 +40,22 @@ googleProvider.setCustomParameters({
 export const auth = getAuth();
 export const signInWithGooglePopup = () =>
   signInWithPopup(auth, googleProvider);
+export const signInWithGoogleRedirect = () =>
+  signInWithRedirect(auth, googleProvider);
 
 export const db = getFirestore();
 
-export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) => {
+export const addCollectionAndDocuments = async (
+  collectionKey,
+  objectsToAdd,
+  field
+) => {
   const collectionRef = collection(db, collectionKey);
   const batch = writeBatch(db);
 
-  objectsToAdd.forEach((obj) => {
-    const docRef = doc(collectionRef, obj.title.toLowerCase());
-    batch.set(docRef, obj);
+  objectsToAdd.forEach((object) => {
+    const docRef = doc(collectionRef, object.title.toLowerCase());
+    batch.set(docRef, object);
   });
 
   await batch.commit();
@@ -65,8 +67,8 @@ export const getCategoriesAndDocuments = async () => {
   const q = query(collectionRef);
 
   const querySnapshot = await getDocs(q);
-  const categoryMap = querySnapshot.docs.reduce((acc, docSnaphot) => {
-    const { title, items} = docSnaphot.data();
+  const categoryMap = querySnapshot.docs.reduce((acc, docSnapshot) => {
+    const { title, items } = docSnapshot.data();
     acc[title.toLowerCase()] = items;
     return acc;
   }, {});
@@ -74,10 +76,9 @@ export const getCategoriesAndDocuments = async () => {
   return categoryMap;
 };
 
-
 export const createUserDocumentFromAuth = async (
   userAuth,
-  aditionalInformation = {},
+  additionalInformation = {}
 ) => {
   if (!userAuth) return;
 
@@ -94,10 +95,10 @@ export const createUserDocumentFromAuth = async (
         displayName,
         email,
         createdAt,
-        ...aditionalInformation,
+        ...additionalInformation,
       });
     } catch (error) {
-      console.log('error creating user', error.message);
+      console.log('error creating the user', error.message);
     }
   }
 
@@ -120,5 +121,3 @@ export const signOutUser = async () => await signOut(auth);
 
 export const onAuthStateChangedListener = (callback) =>
   onAuthStateChanged(auth, callback);
-
-// const analytics = getAnalytics(firebaseApp);

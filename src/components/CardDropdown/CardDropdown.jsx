@@ -1,12 +1,16 @@
 import { v4 as uuidv4 } from 'uuid';
 import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CartContext } from '../../contexts/Cart';
+import { CartContext } from '../../contexts/CartContext';
 
 import Button from '../Button/Button';
 import CartItem from '../CartItem/CartItem';
 
-import './CardDropdown.scss';
+import {
+  CartDropdownContainer,
+  EmptyMessage,
+  CartItems,
+} from './cart-dropdown.styles';
 
 const CartDropdown = () => {
   const { cartItems } = useContext(CartContext);
@@ -17,14 +21,16 @@ const CartDropdown = () => {
   };
 
   return (
-    <div className="cart-dropdown-container">
-      <div className="cart-items">
-        {cartItems.map((cartItem) => (
-          <CartItem key={uuidv4()} cartItem={cartItem} />
-        ))}
-      </div>
+    <CartDropdownContainer>
+      <CartItems>
+        {cartItems.length ? (
+          cartItems.map((item) => <CartItem key={uuidv4()} cartItem={item} />)
+        ) : (
+          <EmptyMessage>Your cart is empty</EmptyMessage>
+        )}
+      </CartItems>
       <Button onClick={goToCheckoutHandler}>GO TO CHECKOUT</Button>
-    </div>
+    </CartDropdownContainer>
   );
 };
 
